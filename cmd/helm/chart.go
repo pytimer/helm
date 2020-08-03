@@ -29,6 +29,11 @@ This command consists of multiple subcommands to work with the chart cache.
 The subcommands can be used to push, pull, tag, list, or remove Helm charts.
 `
 
+type chartOptions struct {
+	insecure  bool
+	plainHTTP bool
+}
+
 func newChartCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:               "chart",

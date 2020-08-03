@@ -34,7 +34,9 @@ Must first run "helm chart save" or "helm chart pull".
 `
 
 func newChartPushCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
-	return &cobra.Command{
+	o := &chartOptions{}
+
+	cmd := &cobra.Command{
 		Use:    "push [ref]",
 		Short:  "push a chart to remote",
 		Long:   chartPushDesc,
@@ -42,7 +44,11 @@ func newChartPushCmd(cfg *action.Configuration, out io.Writer) *cobra.Command {
 		Hidden: !FeatureGateOCI.IsEnabled(),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ref := args[0]
-			return action.NewChartPush(cfg).Run(out, ref)
+			return action.NewChartPush(cfg).Run(out, ref, o.insecure, o.plainHTTP)
 		},
 	}
+
+	cmd.Flags().BoolVarP(&o.insecure, "insecure", "", false, "allow connections to SSL registry without certs")
+	cmd.Flags().BoolVarP(&o.plainHTTP, "plain-http", "", false, "use plain http and not https")
+	return cmd
 }

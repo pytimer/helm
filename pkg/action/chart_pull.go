@@ -35,9 +35,12 @@ func NewChartPull(cfg *Configuration) *ChartPull {
 }
 
 // Run executes the chart pull operation
-func (a *ChartPull) Run(out io.Writer, ref string) error {
+func (a *ChartPull) Run(out io.Writer, ref string, insecure, plainHTTP bool) error {
 	r, err := registry.ParseReference(ref)
 	if err != nil {
+		return err
+	}
+	if err := a.cfg.RegistryClient.NewResolver(insecure, plainHTTP); err != nil {
 		return err
 	}
 	return a.cfg.RegistryClient.PullChart(r)

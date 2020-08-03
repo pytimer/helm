@@ -35,9 +35,12 @@ func NewChartPush(cfg *Configuration) *ChartPush {
 }
 
 // Run executes the chart push operation
-func (a *ChartPush) Run(out io.Writer, ref string) error {
+func (a *ChartPush) Run(out io.Writer, ref string, insecure, plainHTTP bool) error {
 	r, err := registry.ParseReference(ref)
 	if err != nil {
+		return err
+	}
+	if err := a.cfg.RegistryClient.NewResolver(insecure, plainHTTP); err != nil {
 		return err
 	}
 	return a.cfg.RegistryClient.PushChart(r)

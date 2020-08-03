@@ -18,6 +18,7 @@ package registry // import "helm.sh/helm/v3/internal/experimental/registry"
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -51,6 +52,26 @@ type (
 		cache           *Cache
 	}
 )
+
+func (c *Client) NewResolver(insecure, plainHTTP bool) error {
+	client := http.DefaultClient
+	if insecure {
+		client.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+	}
+	resolver, err := c.authorizer.Resolver(context.Background(), client, plainHTTP)
+	if err != nil {
+		return err
+	}
+
+	c.resolver = &Resolver{
+		Resolver: resolver,
+	}
+	return nil
+}
 
 // NewClient returns a new registry client with config
 func NewClient(opts ...ClientOption) (*Client, error) {
